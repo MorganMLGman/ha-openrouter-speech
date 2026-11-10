@@ -27,7 +27,7 @@ Then select the entities in Settings → Voice assistants → your assistant.
 
 - Every language is offered, because OpenRouter does not publish languages per model. Check the provider's documentation for what a model actually supports.
 - STT sends the whole utterance after you stop speaking, because the transcription endpoint does not accept streamed audio.
-- TTS streams the audio back as it is generated.
+- TTS always asks OpenRouter for raw PCM (some models, such as Gemini, support nothing else), wraps it in WAV and lets Home Assistant convert it. PCM is assumed to be 24 kHz unless OpenRouter names another rate; if a voice plays too fast or too slow, open an issue with the model name.
 - To change the model, voice or speed, use ⋮ → **Reconfigure** on the service.
 
 ## Credits
