@@ -14,6 +14,7 @@ from homeassistant.components.tts import (
     ATTR_VOICE,
     TTSAudioRequest,
 )
+from homeassistant.components.tts.const import DATA_TTS_MANAGER
 from homeassistant.components.tts.helper import get_engine_instance
 from homeassistant.core import HomeAssistant
 from homeassistant.exceptions import HomeAssistantError
@@ -151,3 +152,22 @@ async def test_stream_audio_api_error(
     response = await entity.async_stream_tts_audio(_request({}))
     with pytest.raises(HomeAssistantError):
         _ = [c async for c in response.data_gen]
+
+
+async def test_speech_manager_stream(
+    hass: HomeAssistant, loaded_entry: MockConfigEntry, openai_client: MagicMock
+) -> None:
+    """The full HA TTS path (as used by Assist) accepts the engine and streams audio."""
+    create = openai_client.audio.speech.with_streaming_response.create
+    create.return_value = _AudioStream([b"ID3", b"audio"])
+
+    # Without the file cache, so a cached result cannot hide an engine failure.
+    stream = hass.data[DATA_TTS_MANAGER].async_create_result_stream(
+        ENTITY_ID, use_file_cache=False
+    )
+    stream.async_set_message("Speech manager regression")
+
+    assert b"".join([c async for c in stream.async_stream_result()]) == b"ID3audio"
+    assert hass.states.get(ENTITY_ID).attributes["friendly_name"] == (
+        "ElevenLabs: Eleven v4"
+    )

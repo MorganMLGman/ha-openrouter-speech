@@ -14,6 +14,7 @@ from homeassistant.components.tts import (
     TTSAudioResponse,
     Voice,
 )
+from homeassistant.config_entries import ConfigSubentry
 from homeassistant.core import HomeAssistant, callback
 from homeassistant.exceptions import HomeAssistantError
 from homeassistant.generated.languages import LANGUAGES
@@ -68,11 +69,21 @@ def resolve_format(preferred: str) -> tuple[str, Codec]:
 class OpenRouterTTSEntity(TextToSpeechEntity, OpenRouterSpeechEntity):
     """OpenRouter TTS entity."""
 
+    # HA's TTS manager refuses an engine whose name is None ("TTS engine name is
+    # not set"), so the entity is named after the subentry instead of its device.
+    _attr_has_entity_name = False
     _attr_supported_options = [ATTR_VOICE, ATTR_PREFERRED_FORMAT]
     # The models API does not list languages per model, so every language is
     # offered and the provider decides.
     _attr_supported_languages = sorted(LANGUAGES)
     _attr_default_language = "en"
+
+    def __init__(
+        self, entry: OpenRouterSpeechConfigEntry, subentry: ConfigSubentry
+    ) -> None:
+        """Initialize the entity."""
+        super().__init__(entry, subentry)
+        self._attr_name = subentry.title
 
     @callback
     @override

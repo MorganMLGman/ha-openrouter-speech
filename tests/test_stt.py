@@ -7,6 +7,7 @@ import wave
 
 from openai import OpenAIError
 from pytest_homeassistant_custom_component.common import MockConfigEntry
+from pytest_homeassistant_custom_component.typing import ClientSessionGenerator
 
 from homeassistant.components import stt
 from homeassistant.components.stt import (
@@ -105,3 +106,33 @@ async def test_transcribe_empty_text(
     result = await entity.async_process_audio_stream(_metadata(), _stream(b"\x00"))
 
     assert result.result is SpeechResultState.ERROR
+
+
+async def test_stt_http_endpoint(
+    hass: HomeAssistant,
+    loaded_entry: MockConfigEntry,
+    openai_client: MagicMock,
+    hass_client: ClientSessionGenerator,
+) -> None:
+    """HA's own STT path (metadata checks, then the entity) accepts pipeline audio."""
+    openai_client.audio.transcriptions.create.return_value = MagicMock(
+        text="turn on the lights"
+    )
+    client = await hass_client()
+
+    response = await client.post(
+        f"/api/stt/{ENTITY_ID}",
+        headers={
+            "X-Speech-Content": (
+                "format=wav; codec=pcm; sample_rate=16000; bit_rate=16; "
+                "channel=1; language=pl"
+            )
+        },
+        data=b"\x00\x00" * 160,
+    )
+
+    assert response.status == 200
+    assert await response.json() == {"text": "turn on the lights", "result": "success"}
+    assert (
+        openai_client.audio.transcriptions.create.call_args.kwargs["language"] == "pl"
+    )
