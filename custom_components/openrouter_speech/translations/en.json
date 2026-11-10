@@ -1,0 +1,85 @@
+{
+  "config": {
+    "abort": {
+      "already_configured": "This API key is already configured"
+    },
+    "error": {
+      "cannot_connect": "Failed to connect to OpenRouter",
+      "invalid_auth": "Invalid API key",
+      "unknown": "Unexpected error"
+    },
+    "step": {
+      "user": {
+        "data": {
+          "api_key": "API key"
+        },
+        "data_description": {
+          "api_key": "An OpenRouter API key"
+        }
+      }
+    }
+  },
+  "config_subentries": {
+    "stt": {
+      "abort": {
+        "cannot_connect": "Failed to fetch models from OpenRouter",
+        "no_models": "OpenRouter returned no speech-to-text models"
+      },
+      "entry_type": "Speech-to-text",
+      "initiate_flow": {
+        "reconfigure": "Change model",
+        "user": "Add speech-to-text service"
+      },
+      "step": {
+        "user": {
+          "data": {
+            "model": "Model"
+          },
+          "data_description": {
+            "model": "Transcription model. Every language is offered; check the provider's documentation for what the model really supports."
+          }
+        }
+      }
+    },
+    "tts": {
+      "abort": {
+        "cannot_connect": "Failed to fetch models from OpenRouter",
+        "no_models": "OpenRouter returned no text-to-speech models"
+      },
+      "entry_type": "Text-to-speech",
+      "initiate_flow": {
+        "reconfigure": "Change model or voice",
+        "user": "Add text-to-speech service"
+      },
+      "step": {
+        "user": {
+          "data": {
+            "model": "Model"
+          },
+          "data_description": {
+            "model": "Speech model. Every language is offered; check the provider's documentation for what the model really supports."
+          }
+        },
+        "voice": {
+          "description": "Voice options for {model}",
+          "data": {
+            "tts_speed": "Speed",
+            "tts_voice": "Voice"
+          },
+          "data_description": {
+            "tts_speed": "Not every model honours this setting.",
+            "tts_voice": "Voices listed by the model. If the list is empty, type the voice name from the provider's documentation."
+          }
+        }
+      }
+    }
+  },
+  "exceptions": {
+    "api_error": {
+      "message": "Error communicating with the OpenRouter API: {error}"
+    },
+    "invalid_api_key": {
+      "message": "Invalid OpenRouter API key"
+    }
+  }
+}

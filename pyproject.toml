@@ -1,0 +1,20 @@
+[project]
+name = "ha-openrouter-speech"
+version = "0.1.0"
+requires-python = ">=3.14"
+
+[dependency-groups]
+test = ["pytest-homeassistant-custom-component", "openai>=3.10.0", "ruff", "mutagen", "ha-ffmpeg"]
+
+[tool.pytest.ini_options]
+asyncio_mode = "auto"
+testpaths = ["tests"]
+
+[tool.ruff.lint]
+select = ["E", "F", "I", "B", "UP"]
+
+[tool.ruff.lint.isort]
+# Same import layout as Home Assistant core.
+force-sort-within-sections = true
+known-first-party = ["homeassistant", "custom_components"]
+combine-as-imports = true
